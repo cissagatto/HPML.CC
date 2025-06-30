@@ -66,14 +66,14 @@ if __name__ == '__main__':
     #output_dir = "/tmp/cc-emotions/CC/Split-1"
     #fold  = 1
 
-    print("\n\n%==============================================%")
-    print("train: ", sys.argv[1])
-    print("valid: ", sys.argv[2])
-    print("test: ", sys.argv[3])
-    print("label start: ", sys.argv[4])
-    print("output_dir: ", sys.argv[5])
-    print("fold: ", sys.argv[6])
-    print("%==============================================%\n\n")
+    #print("\n\n%==============================================%")
+    #print("train: ", sys.argv[1])
+    #print("valid: ", sys.argv[2])
+    #print("test: ", sys.argv[3])
+    #print("label start: ", sys.argv[4])
+    #print("output_dir: ", sys.argv[5])
+    #print("fold: ", sys.argv[6])
+    #print("%==============================================%\n\n")
 
     # =========== LEITURA DOS DADOS ===========
     train_df = pd.read_csv(train_path)
@@ -144,7 +144,7 @@ if __name__ == '__main__':
     
    
     # =========== SAVE MEASURES ===========   
-    res_curves = eval.multilabel_curves_measures(Y_test, probas_df)    
+    res_curves = eval.multilabel_curve_metrics(Y_test, probas_df)    
     name = (output_dir + "/results-python.csv") 
     res_curves.to_csv(name, index=False)    
 

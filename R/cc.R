@@ -67,7 +67,8 @@ cat("\n#################################################\n\n")
 args <- commandArgs(TRUE)
 
 
-# config_file = "~/HPML.CC/config-files/cc-emotions.csv"
+#config_file = "~/HPML.CC/config-files/cc-emotions.csv"
+
 config_file <- args[1]
 
 if(file.exists(config_file)==FALSE){

@@ -94,7 +94,7 @@ execute.cc.python <- function(parameters){
                         start = as.numeric(parameters$Dataset.Info$AttEnd), " ", 
                         FolderSplit, " ", 
                         fold = f,
-                        sep="")
+                        sep="")    
     
     start <- proc.time()
     res = print(system(str.execute))
@@ -225,7 +225,7 @@ evaluate.cc.python <- function(parameters){
 gather.eval.python.silho <- function(parameters){
   
   final.model.size = data.frame()
-  final.results = data.frame(matrix(ncol = 0, nrow = 28))
+  final.results = data.frame(matrix(ncol = 0, nrow = 26))
   final.runtime = data.frame()
   final.runtime.r = data.frame()
   
@@ -273,11 +273,11 @@ gather.eval.python.silho <- function(parameters){
     
     
     ###########################################################################
-    #system(paste0("rm -r ", folderSplit, "/model_size.csv", sep=""))
-    #system(paste0("rm -r ", folderSplit, "/results-python.csv", sep=""))
-    #system(paste0("rm -r ", folderSplit, "/results-utiml.csv", sep=""))
-    #system(paste0("rm -r ", folderSplit, "/runtime-fold.csv", sep=""))
-    #system(paste0("rm -r ", folderSplit, "/runtime-python.csv", sep=""))
+    system(paste0("rm -r ", folderSplit, "/model_size.csv", sep=""))
+    system(paste0("rm -r ", folderSplit, "/results-python.csv", sep=""))
+    system(paste0("rm -r ", folderSplit, "/results-utiml.csv", sep=""))
+    system(paste0("rm -r ", folderSplit, "/runtime-fold.csv", sep=""))
+    system(paste0("rm -r ", folderSplit, "/runtime-python.csv", sep=""))
     
     f = f + 1
     gc()
