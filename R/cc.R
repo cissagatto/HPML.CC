@@ -67,9 +67,10 @@ cat("\n#################################################\n\n")
 args <- commandArgs(TRUE)
 
 
-#config_file = "~/HPML.CC/config-files/cc-emotions.csv"
+# config_file = "~/HPML.CC/config-files/cc-emotions.csv"
 
 config_file <- args[1]
+
 
 if(file.exists(config_file)==FALSE){
   cat("\n################################################################")
@@ -288,24 +289,27 @@ if(implementation=="utiml"){
   cat("\n# HPML.CC: COMPRESS RESULTS                                  #")
   cat("\n##############################################################\n\n")
   str3 <- paste0(
-    "tar -zcvf /tmp/cc-emotions/",
+    "tar -zcvf ", parameters$Directories$folderResults, "/",
     parameters$Dataset.Info$Name, "-results-cc.tar.gz ",
-    "-C ", parameters$Directories$folderCC, " ."
+    "-C ", parameters$Directories$folderResults, " ."
   )
   print(system(str3))
   
-  cat("\n##########################################################")
-  cat("\n# CC: COPY TO HOME                                       #")
-  cat("\n##########################################################\n\n")
+  
+  cat("\n######################################################")
+  cat("\n# COPY TO HOME                                       #")
+  cat("\n#####################################################\n\n")
   
   str0 = paste0(FolderRoot, "/Reports")
   if(dir.exists(str0)==FALSE){dir.create(str0)}
   
   str3 = paste(parameters$Directories$folderResults , "/",
-               dataset_name, "-results-cc.tar.gz", sep="")
+               parameters$Dataset.Info$Name, 
+               "-results-cc.tar.gz", sep="")
   
   str4 = paste("cp ", str3, " ", str0, sep="")
   print(system(str4))
+  
   
 } else {
   
