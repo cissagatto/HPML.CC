@@ -481,7 +481,7 @@ def multilabel_curves_measures(true_labels: pd.DataFrame, pred_scores: pd.DataFr
     return metrics_df
 
 
-def robust_multilabel_metric(y_true: np.ndarray, 
+def robust_multilabel_metric_original(y_true: np.ndarray, 
                              y_scores: np.ndarray, 
                              metric_func, 
                              average: str) -> float:
@@ -560,9 +560,47 @@ def robust_multilabel_metric(y_true: np.ndarray,
             return None
 
         return np.mean(valid_scores)
+
+
+def robust_multilabel_metric(y_true: np.ndarray, 
+                             y_scores: np.ndarray, 
+                             metric_func, 
+                             average: str):
+    ignored_classes = []
+
+    try:
+        score = metric_func(y_true, y_scores, average=average)
+        return score, ignored_classes
+
+    except ValueError:
+        if average != 'macro':
+            return None, ignored_classes
+
+        n_classes = y_true.shape[1]
+        valid_scores = []
+
+        for i in range(n_classes):
+            true_col = y_true[:, i]
+            pred_col = y_scores[:, i]
+
+            if len(np.unique(true_col)) < 2:
+                ignored_classes.append(i)
+                continue
+
+            try:
+                score_i = metric_func(true_col, pred_col)
+                valid_scores.append(score_i)
+            except ValueError:
+                ignored_classes.append(i)
+
+        if len(valid_scores) == 0:
+            return None, ignored_classes
+
+        return np.mean(valid_scores), ignored_classes
     
 
-def multilabel_curve_metrics(true_labels: pd.DataFrame, predicted_scores: pd.DataFrame) -> pd.DataFrame:
+
+def multilabel_curve_metrics_original(true_labels: pd.DataFrame, predicted_scores: pd.DataFrame) -> pd.DataFrame:
     """
     Calculates curve-based evaluation metrics for multi-label classification with robust handling.
 
@@ -594,6 +632,33 @@ def multilabel_curve_metrics(true_labels: pd.DataFrame, predicted_scores: pd.Dat
     return pd.DataFrame(list(metrics_dict.items()), columns=['Measure', 'Value'])
 
 
+def multilabel_curve_metrics(true_labels: pd.DataFrame, predicted_scores: pd.DataFrame):
+    """
+    Calcula métricas multilabel e retorna dois dataframes:
+    - DataFrame de métricas calculadas
+    - DataFrame das classes ignoradas para cada métrica
+    """
+    metrics_data = []
+    ignored_data = []
+
+    for metric_func, metric_name in [(average_precision_score, 'auprc'), (roc_auc_score, 'roc_auc')]:
+        for avg in ['macro', 'micro']:
+            score, ignored = robust_multilabel_metric(true_labels.values, predicted_scores.values, metric_func, average=avg)
+            
+            metrics_data.append({
+                'Measure': f'{metric_name}_{avg}',
+                'Value': score
+            })
+
+            ignored_data.append({
+                'Measure': f'{metric_name}_{avg}',
+                'Ignored_Classes': ignored if ignored else []
+            })
+
+    metrics_df = pd.DataFrame(metrics_data)
+    ignored_df = pd.DataFrame(ignored_data)
+
+    return metrics_df, ignored_df
 
 
 

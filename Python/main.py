@@ -59,12 +59,12 @@ if __name__ == '__main__':
     output_dir = sys.argv[5]   # output directory
     fold = sys.argv[6]         # fold name or identifier (se precisar)
 
-    #train_path = "/tmp/cc-emotions/Dataset/emotions/CrossValidation/Tr/emotions-Split-Tr-1.csv"
-    #valid_path = "/tmp/cc-emotions/Dataset/emotions/CrossValidation/Vl/emotions-Split-Vl-1.csv"
-    #test_path = "/tmp/cc-emotions/Dataset/emotions/CrossValidation/Ts/emotions-Split-Ts-1.csv"
-    #start_label = 72 
-    #output_dir = "/tmp/cc-emotions/CC/Split-1"
-    #fold  = 1
+    train_path = "/tmp/cc-emotions/Dataset/emotions/CrossValidation/Tr/emotions-Split-Tr-1.csv"
+    valid_path = "/tmp/cc-emotions/Dataset/emotions/CrossValidation/Vl/emotions-Split-Vl-1.csv"
+    test_path = "/tmp/cc-emotions/Dataset/emotions/CrossValidation/Ts/emotions-Split-Ts-1.csv"
+    start_label = 72 
+    output_dir = "/tmp/cc-emotions/CC/Split-1"
+    fold  = 1
 
     #print("\n\n%==============================================%")
     #print("train: ", sys.argv[1])
@@ -144,9 +144,17 @@ if __name__ == '__main__':
     
    
     # =========== SAVE MEASURES ===========   
-    res_curves = eval.multilabel_curve_metrics(Y_test, probas_df)    
+    #res_curves = eval.multilabel_curve_metrics(Y_test, probas_df)    
+    #name = (output_dir + "/results-python.csv") 
+    #res_curves.to_csv(name, index=False)  
+
+    metrics_df, ignored_df = eval.multilabel_curve_metrics(Y_test, probas_df)
+    
     name = (output_dir + "/results-python.csv") 
-    res_curves.to_csv(name, index=False)    
+    metrics_df.to_csv(name, index=False)  
+
+    name = (output_dir + "/ignored-classes.csv") 
+    ignored_df.to_csv(name, index=False)  
 
 
     # =========== SAVE MODEL SIZE EM BYTES ===========
