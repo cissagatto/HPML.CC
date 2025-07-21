@@ -77,9 +77,7 @@ while(w<=length(Implementation.1)){
     cat("\n\tDataset:", ds$Name)
     cat("\n\tPackge:", Implementation.1[w])
     
-    
     name = paste("cc-", ds$Name, sep = "")
-    
     
     # name 
     file_name = paste(FolderPa, "/", name, ".csv", sep="")
@@ -90,11 +88,10 @@ while(w<=length(Implementation.1)){
     # Config file table header
     write("Config, Value", file = output.file, append = TRUE)
     
-    # /lapix/arquivos/elaine
-    write("FolderScripts, ~/HPML.CC/R", 
+    write("FolderScripts, /lapix/arquivos/elaine/HPML.CC/R", 
           file = output.file, append = TRUE)
     
-    write("Dataset_Path, ~/HPML.CC/Datasets", 
+    write("Dataset_Path, /lapix/arquivos/elaine/HPML.CC/Datasets", 
           file = output.file, append = TRUE)
     
     temp.name = paste("/tmp/", name, sep = "")
@@ -113,7 +110,7 @@ while(w<=length(Implementation.1)){
     
     write("Number_Folds, 10", file = output.file, append = TRUE)
     
-    write("Number_Cores, 1", file = output.file, append = TRUE)
+    write("Number_Cores, 10", file = output.file, append = TRUE)
     
     close(output.file)
     

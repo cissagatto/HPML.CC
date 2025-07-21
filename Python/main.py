@@ -57,14 +57,14 @@ if __name__ == '__main__':
     test_path = sys.argv[3]    # test CSV path
     start_label = int(sys.argv[4])  # starting index for labels
     output_dir = sys.argv[5]   # output directory
-    fold = sys.argv[6]         # fold name or identifier (se precisar)
+    fold = sys.argv[6]         # fold name or identifier (se precisar)    
 
-    train_path = "/tmp/cc-emotions/Dataset/emotions/CrossValidation/Tr/emotions-Split-Tr-1.csv"
-    valid_path = "/tmp/cc-emotions/Dataset/emotions/CrossValidation/Vl/emotions-Split-Vl-1.csv"
-    test_path = "/tmp/cc-emotions/Dataset/emotions/CrossValidation/Ts/emotions-Split-Ts-1.csv"
-    start_label = 72 
-    output_dir = "/tmp/cc-emotions/CC/Split-1"
-    fold  = 1
+    """ train_path = "/tmp/cc-corel5k/Dataset/corel5k/CrossValidation/Tr/corel5k-Split-Tr-1.csv"
+    valid_path = "/tmp/cc-corel5k/Dataset/corel5k/CrossValidation/Vl/corel5k-Split-Vl-1.csv"
+    test_path = "/tmp/cc-corel5k/Dataset/corel5k/CrossValidation/Ts/corel5k-Split-Ts-1.csv"
+    start_label = 499
+    output_dir = "/tmp/cc-corel5k/CC/Split-1"
+    fold  = 1 """
 
     #print("\n\n%==============================================%")
     #print("train: ", sys.argv[1])
@@ -112,17 +112,18 @@ if __name__ == '__main__':
     
     # =========== PREDICT PROBA ===========
     start_time_test_proba = time.time()
-    proba = chain.predict_proba(X_test)
+    #proba = chain.predict_proba(X_test)   
+    proba = eval.safe_predict_proba(chain, X_test)
     end_time_test_proba = time.time()
-    test_duration_proba = end_time_test_proba - start_time_test_proba
+    test_duration_proba = end_time_test_proba - start_time_test_proba    
 
     # =========== PREDICT ===========
     start_time_test_bin = time.time()
     bin = chain.predict(X_test)
     end_time_test_bin = time.time()
-    test_duration_bin = end_time_test_bin - start_time_test_bin    
+    test_duration_bin = end_time_test_bin - start_time_test_bin        
     
-    times_df = pd.DataFrame({
+    times_df = pd.DataFrame({        
         'train_duration': [train_duration],
         'test_duration_proba': [test_duration_proba],
         'test_duration_bin': [test_duration_bin]
@@ -165,3 +166,4 @@ if __name__ == '__main__':
         'model_size_bytes': [model_size_bytes]
     })
     model_size_df.to_csv(os.path.join(output_dir, "model_size.csv"), index=False)   
+
