@@ -225,7 +225,7 @@ evaluate.cc.python <- function(parameters){
 gather.eval.python.silho <- function(parameters){
   
   final.model.size = data.frame()
-  final.results = data.frame(matrix(ncol = 0, nrow = 26))
+  final.results = data.frame(matrix(ncol = 0, nrow = 30))
   final.runtime = data.frame()
   final.runtime.r = data.frame()
   

@@ -1,9 +1,9 @@
 Config, Value
-FolderScripts, ~/HPML.CC/R
-Dataset_Path, ~/HPML.CC/Datasets
+FolderScripts, /lapix/arquivos/elaine/HPML.CC/R
+Dataset_Path, /lapix/arquivos/elaine/HPML.CC/Datasets
 Temporary_Path, /tmp/cc-emotions
 Implementation, rf
 Dataset_Name, emotions
 Number_Dataset, 26
 Number_Folds, 10
-Number_Cores, 1
+Number_Cores, 10
