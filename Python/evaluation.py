@@ -809,42 +809,50 @@ def multilabel_curve_metrics(true_labels: pd.DataFrame, predicted_scores: pd.Dat
     return metrics_df, ignored_df
 
 
-########################################################################
-#                                                                      #
-########################################################################    
-def safe_predict_proba(chain, X):
+def verificar_sinal_colunas(df):
+    resultado = {}
+    for col in df.columns:
+        unicos = df[col].unique()
+        if all(unicos > 0):
+            resultado[col] = 'positive'
+        elif all(unicos < 0):
+            resultado[col] = 'negative'
+        elif all(unicos == 0):
+            resultado[col] = 'zero'
+        else:
+            resultado[col] = 'both'
+    return pd.Series(resultado, name="Tipo de valores")
+
+
+
+def safe_predict_proba(chain, X_test, Y_train):
     """
-    Safely computes predicted probabilities for a multi-label classification chain,
-    handling cases where some classifiers were trained on only one class.
+    Safely computes class probabilities for each label in a ClassifierChain, handling single-class cases.
+
+    This function replicates the internal behavior of `ClassifierChain.predict_proba` but includes a fix for
+    cases where certain labels in the training set have only one class (e.g., all 0s or all 1s).
+    Scikit-learn's default behavior raises an IndexError in such cases when trying to access probabilities
+    for non-existent classes. This function avoids that by assuming a constant probability of 0 or 1 
+    depending on the single class seen during training.
 
     Parameters
     ----------
     chain : sklearn.multioutput.ClassifierChain
-        A fitted ClassifierChain instance with binary classifiers.
-
-    X : array-like of shape (n_samples, n_features)
-        The input feature matrix for which to predict probabilities.
+        A fitted ClassifierChain model using any binary classifier as base estimator (e.g., RandomForestClassifier).
+    
+    X_test : pandas.DataFrame
+        The input feature set for which the probability predictions will be made. Should have the same
+        structure and columns as used during training.
+    
+    Y_train : pandas.DataFrame
+        The original multi-label target used during training. Needed to determine the number and order
+        of output labels and to handle label names properly.
 
     Returns
     -------
-    Y_prob_chain : ndarray of shape (n_samples, n_labels)
-        The predicted probability for each label (column) being class 1.
-
-    Notes
-    -----
-    This function handles edge cases where a classifier in the chain
-    was trained on only one class (e.g., only 0s or only 1s in the label).
-    
-    When this occurs, sklearn's `predict_proba` returns only one column.
-    
-    By default, many implementations assume this as full certainty (i.e., 1.0),
-    but this function **assigns a probability of 0.0** in such cases, because:
-
-        - The model has never seen the other class (no true learning),
-        - Assigning 1.0 could lead to misleadingly high confidence,
-        - Setting to 0.0 reflects that the model cannot meaningfully predict.
-
-    This is a conservative and safer behavior for rare or missing label scenarios.
+    prob_df : pandas.DataFrame
+        A DataFrame of shape (n_samples, n_labels), containing the predicted probabilities
+        for the positive class (label = 1) for each label.
 
     Example
     -------
@@ -852,32 +860,31 @@ def safe_predict_proba(chain, X):
     >>> from sklearn.ensemble import RandomForestClassifier
     >>> chain = ClassifierChain(RandomForestClassifier())
     >>> chain.fit(X_train, Y_train)
-    >>> Y_proba = safe_predict_proba(chain, X_test)
+    >>> prob_df = safe_predict_proba(chain, X_test, Y_train)
+    >>> prob_df.to_csv("y_pred_proba.csv", index=False)
     """
-    n_labels = len(chain.estimators_)
-    Y_prob_chain = np.zeros((X.shape[0], n_labels))
+    import numpy as np
+    import pandas as pd
 
-    for chain_idx, estimator in enumerate(chain.estimators_):
-        # Augment features with previous label predictions
-        if chain_idx == 0:
-            X_aug = X
+    n_samples = X_test.shape[0]
+    n_labels = Y_train.shape[1]
+    probas = np.zeros((n_samples, n_labels))
+
+    X_aug = X_test.values  # start with raw test features
+
+    for idx, estimator in enumerate(chain.estimators_):
+        if idx > 0:
+            # Add predicted probabilities of previous labels as features
+            X_aug = np.hstack((X_test.values, probas[:, :idx]))
+
+        proba = estimator.predict_proba(X_aug)
+
+        if proba.shape[1] == 2:
+            # Standard binary case: use probability of class 1
+            probas[:, idx] = proba[:, 1]
         else:
-            X_aug = np.hstack((X, Y_prob_chain[:, :chain_idx]))
+            # Single-class case: force consistent output
+            label_class = estimator.classes_[0]
+            probas[:, idx] = 1.0 if label_class == 1 else 0.0
 
-        probas = estimator.predict_proba(X_aug)
-
-        if probas.shape[1] == 2:
-            # Normal case: model saw both classes (0 and 1)
-            Y_prob_chain[:, chain_idx] = probas[:, 1]
-
-        elif probas.shape[1] == 1:
-            # The model was trained with only one class (e.g., only 0s or only 1s)
-            # Instead of assuming 1.0 (as sklearn normally would),
-            # we chose to return 0.0, reflecting complete uncertainty/zero confidence
-            # because the model didn't see the other class during training.
-            Y_prob_chain[:, chain_idx] = 0.0
-
-        else:
-            raise ValueError(f"Unexpected class shape in label {chain_idx}: {probas.shape}")
-
-    return Y_prob_chain
+    return pd.DataFrame(probas, columns=Y_train.columns)

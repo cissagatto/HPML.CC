@@ -59,12 +59,12 @@ if __name__ == '__main__':
     output_dir = sys.argv[5]   # output directory
     fold = sys.argv[6]         # fold name or identifier (se precisar)    
 
-    """ train_path = "/tmp/cc-corel5k/Dataset/corel5k/CrossValidation/Tr/corel5k-Split-Tr-1.csv"
-    valid_path = "/tmp/cc-corel5k/Dataset/corel5k/CrossValidation/Vl/corel5k-Split-Vl-1.csv"
-    test_path = "/tmp/cc-corel5k/Dataset/corel5k/CrossValidation/Ts/corel5k-Split-Ts-1.csv"
-    start_label = 499
-    output_dir = "/tmp/cc-corel5k/CC/Split-1"
-    fold  = 1 """
+    #train_path = "/tmp/cc-corel5k/Dataset/corel5k/CrossValidation/Tr/corel5k-Split-Tr-1.csv"
+    #valid_path = "/tmp/cc-corel5k/Dataset/corel5k/CrossValidation/Vl/corel5k-Split-Vl-1.csv"
+    #test_path = "/tmp/cc-corel5k/Dataset/corel5k/CrossValidation/Ts/corel5k-Split-Ts-1.csv"
+    #start_label = 499
+    #output_dir = "/tmp/cc-corel5k/CC/Split-1"
+    #fold  = 1
 
     print("\n\n%==============================================%")
     #print("train: ", sys.argv[1])
@@ -95,7 +95,6 @@ if __name__ == '__main__':
     labels_y_test = list(Y_test.columns)
     attr_x_train = list(X_train.columns)
     attr_x_test = list(X_test.columns)
-    
 
     # =========== INITIALIZE MODEL ===========
     random_state = 1234
@@ -112,8 +111,8 @@ if __name__ == '__main__':
     
     # =========== PREDICT PROBA ===========
     start_time_test_proba = time.time()
-    # proba = chain.predict_proba(X_test)   
-    proba = eval.safe_predict_proba(chain, X_test)    
+    #proba = chain.predict_proba(X_test)           
+    proba = eval.safe_predict_proba(chain, X_test, Y_train)    
     end_time_test_proba = time.time()
     test_duration_proba = end_time_test_proba - start_time_test_proba    
 
@@ -133,9 +132,9 @@ if __name__ == '__main__':
     times_df.to_csv(times_path, index=False)
 
     # =========== SAVE PREDICTIONS ===========   
-    probas_df = pd.DataFrame(proba, columns=labels_y_test)
+    # probas_df = pd.DataFrame(proba, columns=labels_y_test)
     probas_path = os.path.join(output_dir, "y_pred_proba.csv")
-    probas_df.to_csv(probas_path, index=False)   
+    proba.to_csv(probas_path, index=False)   
 
     bin_df = pd.DataFrame(bin, columns=labels_y_test)
     bin_path = os.path.join(output_dir, "bin_python.csv")
@@ -149,7 +148,7 @@ if __name__ == '__main__':
     #name = (output_dir + "/results-python.csv") 
     #res_curves.to_csv(name, index=False)      
 
-    metrics_df, ignored_df = eval.multilabel_curve_metrics(Y_test, probas_df)
+    metrics_df, ignored_df = eval.multilabel_curve_metrics(Y_test, proba)
     
     name = (output_dir + "/results-python.csv") 
     metrics_df.to_csv(name, index=False)  

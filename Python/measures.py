@@ -782,4 +782,3 @@ def mlem_wlp(confusion_matrix: pd.DataFrame) -> float:
 
     return wlp
 
-
