@@ -26,10 +26,10 @@ import platform
 import os
 import io
 
-FolderRoot = os.path.expanduser('~/HPML.CC/Python')
-os.chdir(FolderRoot)
-current_directory = os.getcwd()
-sys.path.append('..')
+#FolderRoot = os.path.expanduser('~/HPML.CC/Python')
+#os.chdir(FolderRoot)
+#current_directory = os.getcwd()
+#sys.path.append('..')
 
 import joblib
 import pickle
@@ -66,13 +66,13 @@ if __name__ == '__main__':
     output_dir = "/tmp/cc-corel5k/CC/Split-1"
     fold  = 1 """
 
-    #print("\n\n%==============================================%")
+    print("\n\n%==============================================%")
     #print("train: ", sys.argv[1])
     #print("valid: ", sys.argv[2])
     #print("test: ", sys.argv[3])
     #print("label start: ", sys.argv[4])
     #print("output_dir: ", sys.argv[5])
-    #print("fold: ", sys.argv[6])
+    print("FOLD: ", sys.argv[6])
     #print("%==============================================%\n\n")
 
     # =========== LEITURA DOS DADOS ===========
@@ -112,8 +112,8 @@ if __name__ == '__main__':
     
     # =========== PREDICT PROBA ===========
     start_time_test_proba = time.time()
-    #proba = chain.predict_proba(X_test)   
-    proba = eval.safe_predict_proba(chain, X_test)
+    # proba = chain.predict_proba(X_test)   
+    proba = eval.safe_predict_proba(chain, X_test)    
     end_time_test_proba = time.time()
     test_duration_proba = end_time_test_proba - start_time_test_proba    
 
@@ -123,6 +123,7 @@ if __name__ == '__main__':
     end_time_test_bin = time.time()
     test_duration_bin = end_time_test_bin - start_time_test_bin        
     
+    # =========== SAVE TIME PREDICT ===========
     times_df = pd.DataFrame({        
         'train_duration': [train_duration],
         'test_duration_proba': [test_duration_proba],
@@ -130,7 +131,6 @@ if __name__ == '__main__':
     })
     times_path = os.path.join(output_dir, "runtime-python.csv")
     times_df.to_csv(times_path, index=False)
-
 
     # =========== SAVE PREDICTIONS ===========   
     probas_df = pd.DataFrame(proba, columns=labels_y_test)
@@ -147,7 +147,7 @@ if __name__ == '__main__':
     # =========== SAVE MEASURES ===========   
     #res_curves = eval.multilabel_curve_metrics(Y_test, probas_df)    
     #name = (output_dir + "/results-python.csv") 
-    #res_curves.to_csv(name, index=False)  
+    #res_curves.to_csv(name, index=False)      
 
     metrics_df, ignored_df = eval.multilabel_curve_metrics(Y_test, probas_df)
     
