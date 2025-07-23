@@ -1,5 +1,5 @@
 # Classifier Chains runing with R and Python
-This code is part of my PhD research at PPG-CC/DC/UFSCar in colaboration with Katholieke Universiteit Leuven Campus Kulak Kortrijk Belgium. The R script runs in parallel the ECC made in python.
+This code is part of my PhD research at PPG-CC/DC/UFSCar in colaboration with Katholieke Universiteit Leuven Campus Kulak Kortrijk Belgium. The R script runs in parallel the CC made in python.
 
 ## How to Cite 📑
 If you use this code in your research, please cite the following:
@@ -7,7 +7,7 @@ If you use this code in your research, please cite the following:
 ```bibtex
 @misc{Gatto2025,
   author = {Gatto, E. C.},
-  title = {Classifier Chains},
+  title = {Classifier Chains with R and Python},
   year = {2025},
   publisher = {GitHub},
   journal = {GitHub repository},
@@ -153,7 +153,7 @@ Rscript cc.R [absolute_path_to_config_file]
 Example:
 
 ```
-Rscript cc.R "~/HPML.CC/R/config-files/cc-emotions.csv"
+Rscript cc.R "~/HPML.CC/config-files/cc-emotions.csv"
 ```
 
 ## DOWNLOAD RESULTS
