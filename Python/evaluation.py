@@ -667,6 +667,10 @@ def robust_multilabel_metric(y_true, y_scores, metric_func, average='macro', cla
     0.916...
     >>> print(ignored)
     []
+
+    Notes
+    -----
+    Author: Mauri Ferrandin and Elaine Cecília Gatto
     """
     ignored_classes = []
     valid_scores = []
@@ -773,6 +777,10 @@ def multilabel_curve_metrics(true_labels: pd.DataFrame, predicted_scores: pd.Dat
             Measure       Ignored_Classes
         0  roc_auc_macro   ['Label1']
         1  roc_auc_weighted ['Label1']
+
+    Notes
+    -----
+    Author: Mauri Ferrandin and Elaine Cecília Gatto
     """
     metrics_data = []
     ignored_data = []
@@ -827,7 +835,7 @@ def verificar_sinal_colunas(df):
 
 def safe_predict_proba(chain, X_test, Y_train):
     """
-    Safely computes class probabilities for each label in a ClassifierChain, handling single-class cases.
+    Safely computes class probabilities for each label in a Classifier Chain, handling single-class cases.
 
     This function replicates the internal behavior of `ClassifierChain.predict_proba` but includes a fix for
     cases where certain labels in the training set have only one class (e.g., all 0s or all 1s).
@@ -862,9 +870,12 @@ def safe_predict_proba(chain, X_test, Y_train):
     >>> chain.fit(X_train, Y_train)
     >>> prob_df = safe_predict_proba(chain, X_test, Y_train)
     >>> prob_df.to_csv("y_pred_proba.csv", index=False)
-    """
-    import numpy as np
-    import pandas as pd
+
+    Notes
+    -----
+    Author: Ricardo Cerri and Elaine Cecília Gatto
+    Created: 2025    
+    """    
 
     n_samples = X_test.shape[0]
     n_labels = Y_train.shape[1]
@@ -888,3 +899,18 @@ def safe_predict_proba(chain, X_test, Y_train):
             probas[:, idx] = 1.0 if label_class == 1 else 0.0
 
     return pd.DataFrame(probas, columns=Y_train.columns)
+
+
+"""
+Cerri:
+probas = np.zeros((X_test.shape[0], y_train.shape[1]))
+
+for idx, estimator in enumerate(chain.estimators_):
+    X_aug = ...  # como o chain constrói internamente
+    proba = estimator.predict_proba(X_aug)
+    if proba.shape[1] == 2:
+        probas[:, idx] = proba[:, 1]
+    else:
+        # classe única: assume que é sempre a classe presente
+        probas[:, idx] = proba[:, 0]  # ou 1.0 se for classe positiva
+"""

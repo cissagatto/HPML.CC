@@ -1,5 +1,5 @@
 ##############################################################################
-# ENSEMBLE OF CLASSIFIER CHAINS                                              #
+# CLASSIFIER CHAINS                                                          #
 # Copyright (C) 2025                                                         #
 #                                                                            #
 # This code is free software: you can redistribute it and/or modify it under #
@@ -51,7 +51,7 @@ importlib.reload(ms)
 
 if __name__ == '__main__':
 
-    # =========== ARGUMENTOS ===========
+    # =========== ARGUMENTS ===========
     train_path = sys.argv[1]   # train CSV path
     valid_path = sys.argv[2]   # valid CSV path
     test_path = sys.argv[3]    # test CSV path
@@ -75,7 +75,7 @@ if __name__ == '__main__':
     print("FOLD: ", sys.argv[6])
     #print("%==============================================%\n\n")
 
-    # =========== LEITURA DOS DADOS ===========
+    # =========== READING DATA ===========
     train_df = pd.read_csv(train_path)
     valid_df = pd.read_csv(valid_path)
     test_df = pd.read_csv(test_path)
@@ -144,18 +144,11 @@ if __name__ == '__main__':
     
    
     # =========== SAVE MEASURES ===========   
-    #res_curves = eval.multilabel_curve_metrics(Y_test, probas_df)    
-    #name = (output_dir + "/results-python.csv") 
-    #res_curves.to_csv(name, index=False)      
-
-    metrics_df, ignored_df = eval.multilabel_curve_metrics(Y_test, proba)
-    
+    metrics_df, ignored_df = eval.multilabel_curve_metrics(Y_test, proba)    
     name = (output_dir + "/results-python.csv") 
     metrics_df.to_csv(name, index=False)  
-
     name = (output_dir + "/ignored-classes.csv") 
     ignored_df.to_csv(name, index=False)  
-
 
     # =========== SAVE MODEL SIZE EM BYTES ===========
     model_buffer = io.BytesIO()
