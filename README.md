@@ -24,20 +24,19 @@ The codebase includes R and Python scripts that must be used together.
 ### R Scripts (in `/R` folder):
 
 * `config-files.R`
-* `cc-python.R`
-* `jobs.R`
-* `libraries.R`
+* `cc.R`
 * `run-python.R`
+* `cc-python.R`
 * `utils.R`
+* `libraries.R`
 
 
 ### Python Scripts (in `/Python` folder):
 
+* `main.py`
 * `confusion_matrix.py`
 * `measures.py`
 * `evaluation.py`
-* `ecc.py`
-* `main.py`
 
 
 ## ⚙️ How to Reproduce the Experiment
@@ -141,7 +140,7 @@ Then the experiment was executed in a cluster at UFSC (Federal University of San
 
 
 ## Results
-The results are stored in the _REPORTS_ directory.
+The results are stored in the _REPORTS_ directory in a tar.gz format.
 
 
 ## RUN
@@ -154,7 +153,7 @@ Rscript cc.R [absolute_path_to_config_file]
 Example:
 
 ```
-Rscript cc.R "~/HPML.CC/R/config-files/cc-emotion.csv"
+Rscript cc.R "~/HPML.CC/R/config-files/cc-emotions.csv"
 ```
 
 ## DOWNLOAD RESULTS
