@@ -1,14 +1,15 @@
-cat("\n###########################################################")
-cat("\n# HPML.CC: START                                          #")
-cat("\n###########################################################\n\n")
+cat("\n#########################################################")
+cat("\n# CLASSIFIER CHAINS R SCRIPT START                      #")
+cat("\n#########################################################\n\n")
 
 
 # clean
 rm(list=ls())
 
 
+
 ##############################################################################
-# CLASSIFIER CHAINS                                                          #
+# CLASSIFIER CHAINS - MULTI-LABEL CLASSIFICATION                             #
 # Copyright (C) 2025                                                         #
 #                                                                            #
 # This code is free software: you can redistribute it and/or modify it under #
@@ -19,16 +20,34 @@ rm(list=ls())
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General   #
 # Public License for more details.                                           #
 #                                                                            #
-# Prof. Elaine Cecilia Gatto - UFLA - Lavras, Minas Gerais, Brazil           #
-# Prof. Ricardo Cerri - USP - São Carlos, São Paulo, Brazil                  #
-# Prof. Mauri Ferrandin - UFSC - Blumenau, Santa Catarina, Brazil            #
-# Prof. Celine Vens - Ku Leuven - Kortrijik, West Flanders, Belgium          #
-# PhD Felipe Nakano Kenji - Ku Leuven - Kortrijik, West Flanders, Belgium    #
+# 1 - Prof PhD Elaine Cecilia Gatto                                          #
+# 2 - Prof PhD Ricardo Cerri                                                 #
+# 3 - Prof PhD Mauri Ferrandin                                               #
+# 4 - Prof PhD Celine Vens                                                   #
+# 5 - PhD Felipe Nakano Kenji                                                #
+# 6 - Prof PhD Jesse Read                                                    #
 #                                                                            #
-# BIOMAL - http://www.biomal.ufscar.br                                       #
+# 1 = Federal University of São Carlos - UFSCar - https://www2.ufscar.br     #
+# Campus São Carlos | Computer Department - DC - https://site.dc.ufscar.br | #
+# Post Graduate Program in Computer Science - PPGCC                          # 
+# http://ppgcc.dc.ufscar.br | Bioinformatics and Machine Learning Group      #
+# BIOMAL - http://www.biomal.ufscar.br                                       # 
+#                                                                            # 
+# 1 = Federal University of Lavras - UFLA                                    #
+#                                                                            # 
+# 2 = State University of São Paulo - USP                                    #
+#                                                                            # 
+# 3 - Federal University of Santa Catarina Campus Blumenau - UFSC            #
+# https://ufsc.br/                                                           #
+#                                                                            #
+# 4 and 5 - Katholieke Universiteit Leuven Campus Kulak Kortrijk Belgium     #
+# Medicine Department - https://kulak.kuleuven.be/                           #
+# https://kulak.kuleuven.be/nl/over_kulak/faculteiten/geneeskunde            #
+#                                                                            #
+# 6 - Ecole Polytechnique | Institut Polytechnique de Paris | 1 rue Honoré   #
+# d’Estienne d’Orves - 91120 - Palaiseau - FRANCE                            #
 #                                                                            #
 ##############################################################################
-
 
 
 ###############################################################################
@@ -43,54 +62,54 @@ FolderScripts <- here::here("R")
 cat("\n############################################")
 cat("\n# HPML.CC: R Options Configuration         #")
 cat("\n############################################\n\n")
-options(java.parameters = "-Xmx64g")  # JAVA
-options(show.error.messages = TRUE)   # ERROR MESSAGES
-options(scipen=20)                    # number of places after the comma
+options(java.parameters = "-Xmx64g")
+options(show.error.messages = TRUE)
+options(scipen=20)                 
+options(repos = c(CRAN = "https://cloud.r-project.org"))
 
 
-########################################
+cat("\n########################################")
+cat("\n# Creating parameters list             #")
+cat("\n########################################\n\n")
 parameters = list()
-########################################
 
 
-cat("\n##################################################")
-cat("\n# HPML.CC: Reading Datasets-Original.csv         #")
-cat("\n##################################################\n\n")
-setwd(FolderRoot)
-datasets <- data.frame(read.csv("datasets-original.csv"))
+cat("\n########################################")
+cat("\n# Reading Datasets-Original.csv        #")
+cat("\n########################################\n\n")
+name = paste0(FolderRoot, "/datasets-original.csv")
+datasets <- data.frame(read.csv(name))
 parameters$Datasets.List = datasets
 
 
-cat("\n#################################################")
-cat("\n# HPML.CC: GET ARGUMENTS FROM COMMAND LINE      #")
-cat("\n#################################################\n\n")
+cat("\n#####################################")
+cat("\n# GET ARGUMENTS FROM COMMAND LINE   #")
+cat("\n#####################################\n\n")
 args <- commandArgs(TRUE)
-
-
-# config_file = "~/HPML.CC/config-files/cc-corel5k-1.csv"
 
 config_file <- args[1]
 
+# config_file = "~/HPML.CC/config-files/cc-GnegativeGO-1.csv"
 
+
+parameters$Config.File$Name = config_file
 if(file.exists(config_file)==FALSE){
   cat("\n################################################################")
-  cat("#\n HPML.CC: Missing Config File! Verify the following path:     #")
-  cat("#\n ", config_file, "                                            #")
-  cat("##################################################################\n\n")
+  cat("\n# Missing Config File! Verify the following path:              #")
+  cat("\n################################################################")
+  cat("\n# ", config_file)
   break
 } else {
-  cat("\n###################################################")
-  cat("\n# HPML.CC: Properly loaded configuration file!    #")
-  cat("\n###################################################\n\n")
+  cat("\n########################################")
+  cat("\n# Properly loaded configuration file!  #")
+  cat("\n########################################\n\n")
 }
 
-
-cat("\n##################################################")
-cat("\n# HPML.CC: Config File                           #")
-cat("\n##################################################\n\n")
+cat("\n########################################")
+cat("\n# Config File                          #")
+cat("\n########################################")
 config = data.frame(read.csv(config_file))
 print(config)
-
 
 
 cat("\n#################################################")
@@ -129,32 +148,28 @@ ds = datasets[number_dataset,]
 parameters$Dataset.Info = ds
 
 
-cat("\n################################################################\n")
-print(ds)
-cat("\n################################################################\n\n")
-
-
-cat("\n#####################################################")
-cat("\n# HPML.CC: Creating temporary processing folder     #")
-cat("\n#####################################################\n\n")
+cat("\n########################################")
+cat("\n# Creating temporary processing folder #")
+cat("\n########################################\n\n")
 if (dir.exists(folderResults) == FALSE) {dir.create(folderResults)}
 
 
-
-cat("\n##################################################")
-cat("\n# HPML.CC: Loading R Sources                     #")
-cat("\n##################################################\n\n")
+cat("\n########################################")
+cat("\n# Loading R Sources                    #")
+cat("\n########################################\n\n")
 source(file.path(FolderScripts, "libraries.R"))
 source(file.path(FolderScripts, "utils.R"))
 
 
-
-cat("\n#########################################")
-cat("\n# HPML.CC: Get directories              #")
-cat("\n#########################################\n\n")
+cat("\n###############################")
+cat("\n# Get directories             #")
+cat("\n###############################\n\n")
 diretorios <- directories(parameters)
 parameters$Directories = diretorios
 
+FolderCC2 = paste0(parameters$Directories$FolderResults, "/CC2")
+if(dir.exists(FolderCC2)==FALSE){dir.create(FolderCC2)}
+parameters$Directories$FolderCC2 = FolderCC2
 
 
 cat("\n####################################################################")
@@ -212,7 +227,7 @@ if(file.exists(str00)==FALSE){
 ##############################################################################
 
 if(implementation=="utiml"){
-  # 
+   
   # setwd(FolderScripts)
   # source("run-utiml.R")
   # 
@@ -275,7 +290,7 @@ if(implementation=="utiml"){
   cat("\n#####################################################\n\n")
   result_set <- t(data.matrix(timeFinal))
   setwd(diretorios$folderCC)
-  write.csv(result_set, "Runtime-Final.csv")
+  write.csv(result_set, "runtime-script.csv")
   
   
   cat("\n###################################################")

@@ -609,9 +609,10 @@ def multilabel_ranking_measures(true_labels: pd.DataFrame, pred_scores: pd.DataF
     return metrics_df
 
 
-########################################################################
-#                                                                      #
-########################################################################
+
+#=================================================================#
+# ROBUST MULITLABEL METRIC - RETURNS IGNORED CLASSES IN A DF      #
+#=================================================================#
 def robust_multilabel_metric(y_true, y_scores, metric_func, average='macro', class_names=None, verbose=True):
     """
     Compute robust multilabel evaluation metrics, ignoring classes with undefined behavior.
@@ -671,68 +672,124 @@ def robust_multilabel_metric(y_true, y_scores, metric_func, average='macro', cla
     Notes
     -----
     Author: Mauri Ferrandin and Elaine Cecília Gatto
-    """
+    """    
+
+    # Initialize list to store ignored class names (those with only one label type)
     ignored_classes = []
+
+    # List to collect valid per-class metric scores
     valid_scores = []
 
+    # Get the number of classes (columns in y_true)
     n_classes = y_true.shape[1]
 
+    # Iterate over each class (column)
     for i in range(n_classes):
+
+        # Extract the true labels and predicted scores for the current class
         true_col = y_true[:, i]
         pred_col = y_scores[:, i]
 
+        #-------------------------------------------------------------------#
+        # Check if the class has both positive and negative samples
+        #-------------------------------------------------------------------#
         if len(np.unique(true_col)) < 2:
+
+            # Determine the class name (use provided or default)
             class_label = class_names[i] if class_names else f"Class {i}"
+
+            # Add this class to the ignored list
             ignored_classes.append(class_label)
+
+            # Optionally print a warning message
             if verbose:
                 print(f"⚠️ Class '{class_label}' ignored: only one class present in true labels.")
             continue
 
+
+        #-------------------------------------------------------------------#
+        # 
+        #-------------------------------------------------------------------#
         try:
+            # Temporarily suppress warnings about undefined metrics
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore", category=UserWarning)
                 warnings.simplefilter("ignore", category=UndefinedMetricWarning)
+                 
+                # --------> Compute the metric for this class <--------
                 score_i = metric_func(true_col, pred_col)
+            
+            # Store the valid score
             valid_scores.append(score_i)
-        except ValueError:
+
+        except ValueError:            
+            # Handle exceptions raised by the metric function
             class_label = class_names[i] if class_names else f"Class {i}"
             ignored_classes.append(class_label)
             if verbose:
                 print(f"⚠️ Class '{class_label}' ignored due to error when computing the metric.")
 
+    
+    #-------------------------------------------------------------------#
+    # If no valid classes remain, return NaN and the ignored list
+    #-------------------------------------------------------------------#
     if not valid_scores:
         if verbose:
             print(f"⚠️ Metric '{metric_func.__name__}' with '{average}' averaging failed: no valid classes.")
         return np.nan, ignored_classes
+    
 
+    #-------------------------------------------------------------------#
+    # Handle averaging options
+    #-------------------------------------------------------------------#
+
+    # --->  1. Macro average: mean of all valid per-class scores
     if average == 'macro':
         return np.mean(valid_scores), ignored_classes
+    
+    # --->  2. Weighted average: mean weighted by class support (number of positives)
     elif average == 'weighted':
+        # Compute supports for valid classes only
         supports = [np.sum(y_true[:, i]) for i in range(n_classes) if len(np.unique(y_true[:, i])) > 1]
+        
+        # Total number of positive labels across valid classes
         total_support = np.sum(supports)
+        
+        # Compute normalized weights
         weights = [s / total_support for s in supports]
+
+        # Weighted average of scores
         return np.average(valid_scores, weights=weights), ignored_classes
+    
+    # ---> 3. Samples average: compute per-sample metric then average
     elif average == 'samples':
         try:
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore", category=UserWarning)
+                # Compute the sample-based average directly using the metric function
                 return metric_func(y_true, y_scores, average='samples'), ignored_classes
         except ValueError:
+            # Return NaN if computation fails
             return np.nan, ignored_classes
+    
+    # ---> 4. Micro average: aggregate all predictions and compute a global metric
     elif average == 'micro':
         try:
             with warnings.catch_warnings():
                 warnings.simplefilter("ignore", category=UserWarning)
+                # Compute the micro-averaged score
                 return metric_func(y_true, y_scores, average='micro'), ignored_classes
         except ValueError:
+            # Return NaN if the computation fails
             return np.nan, ignored_classes
 
 
 
 
-########################################################################
-#                                                                      #
-########################################################################
+
+#=================================================================#
+# MULTILABEL CURVE METRICS - CALLS ROBUST MULTILABEL METRIC       #
+#=================================================================#
 def multilabel_curve_metrics(true_labels: pd.DataFrame, predicted_scores: pd.DataFrame):
     """
     Compute multilabel curve-based evaluation metrics (AUPRC and ROC AUC) with support 
@@ -784,7 +841,6 @@ def multilabel_curve_metrics(true_labels: pd.DataFrame, predicted_scores: pd.Dat
     """
     metrics_data = []
     ignored_data = []
-
     class_names = true_labels.columns.tolist()
 
     for metric_func, metric_name in [

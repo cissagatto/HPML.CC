@@ -89,14 +89,14 @@ if __name__ == '__main__':
     # juntando treino com validação    
     train = pd.concat([train,valid],axis=0).reset_index(drop=True) 
 
-    print("\n\n%==============================================%")
-    print("train: ", sys.argv[1])
-    print("valid: ", sys.argv[2])
-    print("test: ", sys.argv[3])
-    print("label start: ", sys.argv[4])
-    print("output_dir: ", sys.argv[5])
-    print("FOLD: ", sys.argv[6])
-    print("%==============================================%\n\n")
+    #print("\n\n%==============================================%")
+    #print("train: ", sys.argv[1])
+    #print("valid: ", sys.argv[2])
+    #print("test: ", sys.argv[3])
+    #print("label start: ", sys.argv[4])
+    #print("output_dir: ", sys.argv[5])
+    #print("FOLD: ", sys.argv[6])
+    #print("%==============================================%\n\n")
 
     # Features and labels separation
     X_train = train.iloc[:, :start]
@@ -160,8 +160,11 @@ if __name__ == '__main__':
 
    
     # =========== SAVE MEASURES ===========   
-    metrics_df = eval.multilabel_curves_measures(Y_test, pd.DataFrame(proba_df, columns=labels_y_test))
-    metrics_df.to_csv(os.path.join(directory, "results-python.csv"), index=False)           
+    metrics_df, ignored_df = eval.multilabel_curve_metrics(Y_test, proba_df)        
+    name = (directory + "/results-python.csv") 
+    metrics_df.to_csv(name, index=False)      
+    name = (directory + "/ignored-classes.csv") 
+    ignored_df.to_csv(name, index=False)       
     
 
     # =========== SAVE MODEL SIZE EM BYTES ===========
