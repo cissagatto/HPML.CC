@@ -86,7 +86,7 @@ if __name__ == '__main__':
     start = int(sys.argv[4])    
     directory = sys.argv[5]    
     
-    # juntando treino com validação    
+    # VERIFICANDO SE NÃO DUPLIQUEI ISSO AQUI
     train = pd.concat([train,valid],axis=0).reset_index(drop=True) 
 
     print("\n\n%==============================================%")
