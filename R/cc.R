@@ -303,27 +303,37 @@ if(implementation=="utiml"){
   cat("\n##############################################################")
   cat("\n# HPML.CC: COMPRESS RESULTS                                  #")
   cat("\n##############################################################\n\n")
-  str3 <- paste0(
-    "tar -zcvf ", parameters$Directories$folderResults, "/",
-    parameters$Dataset.Info$Name, "-results-cc.tar.gz ",
-    "-C ", parameters$Directories$folderResults, " ."
-  )
-  print(system(str3))
+  folder_results <- parameters$Directories$FolderResults
+  output_tar <- paste0(folder_results, "/", parameters$Dataset.Info$Name, 
+    "-results-cc.tar.gz")
+  
+  str_01 <- paste0("tar -zcvf ", output_tar, " -C ", folder_results, " CC CC2")
+  res <- system(str_01)
+  
+  if(res != 0){
+    system(paste("rm -r ", parameters$Directories$FolderResults, sep=""))
+    print(res)
+    stop("\n\n Something went wrong in compressing results files \n\n")
+  }
   
   
   cat("\n######################################################")
   cat("\n# COPY TO HOME                                       #")
-  cat("\n#####################################################\n\n")
-  
-  str0 = paste0(FolderRoot, "/Reports")
-  if(dir.exists(str0)==FALSE){dir.create(str0)}
-  
-  str3 = paste(parameters$Directories$folderResults , "/",
-               parameters$Dataset.Info$Name, 
-               "-results-cc.tar.gz", sep="")
-  
-  str4 = paste("cp ", str3, " ", str0, sep="")
-  print(system(str4))
+  cat("\n#####################################################\n\n")  
+      str0 = paste0(FolderRoot, "/Reports")
+      if(dir.exists(str0)==FALSE){dir.create(str0)}
+      
+      str4 <- paste0(parameters$Directories$folderResults, "/",
+        parameters$Dataset.Info$Name, "-results-cc.tar.gz")
+      
+      str5 = paste("cp ", str4, " ", str0, sep="")
+      res = system(str5)
+      
+      if(res!=0){
+        system(paste("rm -r ", parameters$Directories$FolderResults, sep=""))
+        print(res)
+        stop("\n\n Something went wrong in compressing results files \n\n")
+      }
   
   
 } else {

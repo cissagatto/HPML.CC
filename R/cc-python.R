@@ -140,7 +140,7 @@ execute.cc.python <- function(parameters){
     
     
     ##################################################################
-    str.execute = paste("python3 ", parameters$Directories$FolderPython,
+    str.execute2 = paste("python3 ", parameters$Directories$FolderPython,
                         "/main2.py ", 
                         train.file.name, " ",
                         val.file.name,  " ",
@@ -150,7 +150,7 @@ execute.cc.python <- function(parameters){
                         fold = f,
                         sep="")    
     
-    res = system(str.execute)
+    res = system(str.execute2)
     if(res!=0){
       system(paste("rm -r ", parameters$Directories$FolderResults, sep=""))
       stop("\n\n Something went wrong in python 2 \n\n")
@@ -184,6 +184,11 @@ evaluate.cc.python <- function(parameters, folder){
     #########################################################################
     cat("\nFold: ", f)
     FolderScripts <- here::here("R")
+
+
+    ###########################################################################
+    FolderSplit = paste(folder, "/Split-", f, sep="")
+    
     
     ###########################################################################
     #source(file.path(FolderScripts , "libraries.R"))
@@ -223,8 +228,7 @@ evaluate.cc.python <- function(parameters, folder){
     mldr.tv = mldr_from_dataframe(tv, labelIndices = labels.indices)
     
     
-    ###########################################################################
-    FolderSplit = paste(folder, "/Split-", f, sep="")
+    
     
     
     #####################################################################
