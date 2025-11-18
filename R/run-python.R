@@ -61,7 +61,6 @@
 run.cc.python <- function(parameters){
   
   
-  
   source(file.path(parameters$Config.File$FolderScripts, "cc-python.R"))
   
   if(parameters$Config.File$Number.Cores == 0){
@@ -107,44 +106,28 @@ run.cc.python <- function(parameters){
   time.execute = system.time(execute.cc.python(parameters))
   
   
-  cat("\n############################################################")
-  cat("\n# RUN: Evaluate 1                                         #")
-  cat("\n############################################################\n\n")
+  cat("\n##########################################################")
+  cat("\n# RUN: Evaluate                                          #")
+  cat("\n##########################################################\n\n")
   time.evaluate = system.time(evaluate.cc.python(parameters,
                                                  folder = parameters$Directories$folderCC))
   
   
-  cat("\n############################################################")
-  cat("\n# RUN: Evaluate 2                                          #")
-  cat("\n############################################################\n\n")
-  time.evaluate = system.time(evaluate.cc.python(parameters, 
-                                                 folder = parameters$Directories$FolderCC2))
-  
-  
-  cat("\n############################################################")
-  cat("\n# RUN: Gather Evaluated Measures 1                         #")
-  cat("\n############################################################\n\n")
+  cat("\n###########################################################")
+  cat("\n# RUN: Gather Evaluated Measures                          #")
+  cat("\n###########################################################\n\n")
   time.gather.evaluate = system.time(gather.eval.python.silho(parameters, 
                                                               folder = parameters$Directories$folderCC))
-  
-  
-  cat("\n############################################################")
-  cat("\n# RUN: Gather Evaluated Measures 2                         #")
-  cat("\n############################################################\n\n")
-  time.gather.evaluate = system.time(gather.eval.python.silho(parameters, 
-                                                              folder = parameters$Directories$FolderCC2))
-  
-  
-  
-  # 
+
+
   # cat("\n############################################################")
   # cat("\n# RUN: Save Runtime                                        #")
   # cat("\n##############################################################\n\n")
   # RunTime = rbind(time.execute, time.evaluate, time.gather.evaluate)
   # setwd(diretorios$folderCC)
   # write.csv(RunTime, "runtime-run-python.csv")
-  # 
-  # 
+   
+  
   cat("\n\n############################################################")
   cat("\n# RUN: Stop Parallel                                         #")
   cat("\n##############################################################\n\n")

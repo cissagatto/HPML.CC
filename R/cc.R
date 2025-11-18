@@ -89,6 +89,7 @@ args <- commandArgs(TRUE)
 
 config_file <- args[1]
 
+
 # config_file = "~/HPML.CC/config-files/cc-GnegativeGO-1.csv"
 
 
@@ -296,24 +297,46 @@ if(implementation=="utiml"){
   cat("\n###################################################")
   cat("\n# HPML.CC: DELETE ALL TEMPORARY FILES             #")
   cat("\n###################################################\n\n")
-  str5 = paste("rm -r ", diretorios$folderDataset, sep="")
+  str5 = paste("rm -r ", parameters$Directories$folderDataset, sep="")
+  print(system(str5))
+  
+  # /tmp/cc-GnegativeGO/CC2
+  str5 = paste("rm -r ", parameters$Directories$folderResults, "/CC2", sep="")
   print(system(str5))
   
   
   cat("\n##############################################################")
   cat("\n# HPML.CC: COMPRESS RESULTS                                  #")
   cat("\n##############################################################\n\n")
-  folder_results <- parameters$Directories$FolderResults
-  output_tar <- paste0(folder_results, "/", parameters$Dataset.Info$Name, 
-    "-results-cc.tar.gz")
+  # folder_results <- parameters$Directories$FolderResults
+  # output_tar <- paste0(folder_results, "/", parameters$Dataset.Info$Name, 
+  #   "-results-cc.tar.gz")
+  # 
+  # str_01 <- paste0("tar -zcvf ", output_tar, " -C ", folder_results, " CC CC2")
+  # res <- system(str_01)
+  # 
+  # if(res != 0){
+  #   system(paste("rm -r ", parameters$Directories$FolderResults, sep=""))
+  #   print(res)
+  #   stop("\n\n Something went wrong in compressing results files \n\n")
+  # }
   
-  str_01 <- paste0("tar -zcvf ", output_tar, " -C ", folder_results, " CC CC2")
-  res <- system(str_01)
+  # base_dir   <- "/tmp/d-GnegativeGO/Tested"
+  base_dir   <- parameters$Directories$folderCC
   
-  if(res != 0){
-    system(paste("rm -r ", parameters$Directories$FolderResults, sep=""))
-    print(res)
-    stop("\n\n Something went wrong in compressing results files \n\n")
+  # output_tar <- "/tmp/d-GnegativeGO/GnegativeGO-results-hpml.tar.gz"
+  output_tar <- paste0(parameters$Directories$FolderResults, "/",
+                       parameters$Dataset.Info$Name, "-results-cc.tar.gz")
+  
+  cmd <- paste("tar -zcvf", output_tar, "-C", base_dir, ".")
+  res = system(cmd)
+  
+  if (res != 0) {
+    #system(paste("rm -r", base_dir))
+    #print(res)
+    message("\n\n Something went wrong in compressing results files \n\n")
+  } else {
+    cat("\n✅ Compressão concluída com sucesso!\n")
   }
   
   
@@ -338,7 +361,7 @@ if(implementation=="utiml"){
   
 } else {
   
-  # 
+   
   # setwd(FolderScripts)
   # source("run-mulan.R")
   # 

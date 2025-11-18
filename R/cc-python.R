@@ -137,26 +137,7 @@ execute.cc.python <- function(parameters){
     } else {
       message("\n\n PYTHON RAN OK! \n\n")
     }
-    
-    
-    ##################################################################
-    str.execute2 = paste("python3 ", parameters$Directories$FolderPython,
-                        "/main2.py ", 
-                        train.file.name, " ",
-                        val.file.name,  " ",
-                        test.file.name, " ", 
-                        start = as.numeric(parameters$Dataset.Info$AttEnd), " ", 
-                        FolderSplit2, " ", 
-                        fold = f,
-                        sep="")    
-    
-    res = system(str.execute2)
-    if(res!=0){
-      system(paste("rm -r ", parameters$Directories$FolderResults, sep=""))
-      stop("\n\n Something went wrong in python 2 \n\n")
-    } else {
-      message("\n\n PYTHON RAN OK! \n\n")
-    }
+  
     
     #f = f + 1
     gc()
@@ -178,12 +159,18 @@ execute.cc.python <- function(parameters){
 evaluate.cc.python <- function(parameters, folder){
   
   f = 1
-  # avaliaParalel <- foreach (f = 1:parameters$Config.File$Number.Folds) %dopar%{
-  while(f<=parameters$Config.File$Number.Folds){
+  avaliaParalel <- foreach (f = 1:parameters$Config.File$Number.Folds) %dopar%{
+  #while(f<=parameters$Config.File$Number.Folds){
     
     #########################################################################
     cat("\nFold: ", f)
     FolderScripts <- here::here("R")
+    
+    
+    #########################################################################
+    cat("\nFold: ", f)
+    source(file.path(parameters$Config.File$FolderScripts, "libraries.R"))
+    source(file.path(parameters$Config.File$FolderScripts, "utils.R"))
 
 
     ###########################################################################
@@ -270,15 +257,13 @@ evaluate.cc.python <- function(parameters, folder){
     ##########################################################################    
     avaliacao(f = f, y_true = y.true.3, y_pred = y_pred_proba,
               salva = FolderSplit, nome = "results-utiml")
-    
-    ##########################################################################    
-    avaliacao(f = f, y_true = y.true.3, y_pred = y_pred_proba,
-              salva = FolderSplit, nome = "results-utiml")
+
     
     ##########################################################################    
     roc.curve(f = f, y_pred = y_pred_proba, test = y.true.3, 
               Folder = FolderSplit, 
               nome = paste(FolderSplit, "/results-mldr.csv", sep=""))
+    
     
     ##########################################################################    
     # auprc.curve <- function(y_true, y_proba, Folder, nome){
@@ -286,33 +271,30 @@ evaluate.cc.python <- function(parameters, folder){
                 y_proba = y_pred_proba,
                 Folder = FolderSplit, 
                 nome = paste(FolderSplit, "/results-r.csv", sep=""))
-    # 
-    # 
-    # # ###########################################################################
-    # # # names files
-    # nome.tr.csv = paste(FolderSplit, "/",
-    #                     parameters$Config.File$Dataset.Name ,
-    #                     "-Split-Tr-", f, ".csv", sep="")
-    # nome.ts.csv = paste(FolderSplit, "/",
-    #                     parameters$Config.File$Dataset.Name,
-    #                     "-Split-Ts-", f, ".csv", sep="")
-    # nome.vl.csv = paste(FolderSplit, "/",
-    #                     parameters$Config.File$Dataset.Name,
-    #                     "-Split-Vl-", f, ".csv", sep="")
-    # 
-    # if(file.exists(nome.tr.csv)){
-    #   system(paste0("rm -r ", nome.tr.csv))
-    # }
-    # 
-    # if(file.exists(nome.ts.csv)){
-    #   system(paste0("rm -r ", nome.ts.csv))
-    # }
-    # 
-    # if(file.exists(nome.vl.csv)){
-    #   system(paste0("rm -r ", nome.vl.csv))
-    # }
     
-    f = f + 1
+    
+    #########################################################################
+    name.true = paste0(FolderSplit, "/y_true.csv")
+    name.proba = paste0(FolderSplit, "/y_pred_proba.csv")
+    
+    str.execute = paste("python3 ", parameters$Directories$FolderPython,
+                        "/curves.py ", 
+                        name.true, " ", 
+                        name.proba, " ", 
+                        FolderSplit, " ", 
+                        sep = "")
+    res = system(str.execute)
+    
+    if(res!=0){
+      #system(paste("rm -r ", parameters$Directories$FolderResults, sep=""))
+      #stop("\n\n Something went wrong in python\n\n")
+      message("\n\n Something went wrong in python \n\n")
+    } else {
+      message("\n\n PYTHON RAN OK! \n\n")
+    }
+    
+    
+    #f = f + 1
     gc()
   }
   
